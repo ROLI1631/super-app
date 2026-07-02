@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { PrimaryLayout } from '../components/layout/PrimaryLayout';
 
 export const metadata: Metadata = {
   title: 'Super App',
-  description: 'A Next.js 15 app with TypeScript and Tailwind CSS.',
+  description: 'A lightweight marketplace MVP built with the existing core modules.',
 };
 
 export default function RootLayout({
@@ -13,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <PrimaryLayout>{children}</PrimaryLayout>
+      </body>
     </html>
   );
 }
