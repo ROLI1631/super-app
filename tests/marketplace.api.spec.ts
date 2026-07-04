@@ -1,9 +1,9 @@
-import { createDefaultCoreServices } from '../core/factory';
-import { createMarketplaceApi } from '../api/marketplaceApi';
+import { createDefaultInfrastructureServices } from '../infrastructure/factory';
+import { createMarketplaceApi } from '../infrastructure/api/marketplaceApi';
 
 describe('Marketplace API read-only', () => {
   it('exposes listings, offers, reservations, orders, negotiations', async () => {
-    const core = createDefaultCoreServices();
+    const core = createDefaultInfrastructureServices();
     const m = core.marketplace;
     const api = createMarketplaceApi(m as any);
 

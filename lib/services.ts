@@ -1,9 +1,9 @@
-import { createDefaultCoreServices } from '../core/factory';
-import { CatalogApi } from '../api/catalogApi';
-import { createMarketplaceApi } from '../api/marketplaceApi';
-import { createFinanceApi } from '../api/financeApi';
+import { createDefaultInfrastructureServices } from '../infrastructure/factory';
+import { CatalogApi } from '../infrastructure/api/catalogApi';
+import { createMarketplaceApi } from '../infrastructure/api/marketplaceApi';
+import { createFinanceApi } from '../infrastructure/api/financeApi';
 
-const services = createDefaultCoreServices();
+const services = createDefaultInfrastructureServices();
 
 if (services.identityCore.listIdentities().length === 0) {
   services.identityCore.registerIdentity({

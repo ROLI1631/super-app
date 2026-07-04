@@ -1,13 +1,16 @@
 import { EventBus, EventHandler, EventMessage } from './eventBus';
 import { TimeCore } from './timeCore';
 import { Journal } from './journal';
-import { AlphabetEngine } from '../engines/alphabetEngine';
 import {
   EVENT_RECORD_TYPE,
   PlatformEvent,
   PROCESSED_EVENT_CHANNEL,
   RAW_EVENT_CHANNEL,
 } from './event';
+
+export interface MetadataEnricher {
+  enrich(payload: unknown, metadata: Record<string, unknown> | undefined): Record<string, unknown>;
+}
 
 export interface EventPipeline {
   subscribe(handler: EventHandler<PlatformEvent>): void;
@@ -20,7 +23,7 @@ export class DefaultEventPipeline implements EventPipeline {
     private readonly eventBus: EventBus,
     private readonly timeCore: TimeCore,
     private readonly journal: Journal,
-    private readonly alphabetEngine?: AlphabetEngine,
+    private readonly metadataEnricher?: MetadataEnricher,
   ) {
     this.eventBus.subscribe(RAW_EVENT_CHANNEL, this.handleRawEvent.bind(this));
   }
@@ -44,8 +47,8 @@ export class DefaultEventPipeline implements EventPipeline {
 
     this.timeCore.record(event, EVENT_RECORD_TYPE, event.moduleId, event.metadata);
 
-    const enrichedMetadata = this.alphabetEngine
-      ? this.enrichWithAlphabet(event.payload, event.metadata)
+    const enrichedMetadata = this.metadataEnricher
+      ? this.metadataEnricher.enrich(event.payload, event.metadata)
       : event.metadata;
 
     const processedEvent = {
@@ -62,50 +65,4 @@ export class DefaultEventPipeline implements EventPipeline {
     });
   }
 
-  private enrichWithAlphabet(payload: unknown, metadata: Record<string, unknown> | undefined) {
-    const results: Record<string, unknown> = {};
-
-    const walk = (node: unknown, path: string) => {
-      if (node === null || node === undefined) return;
-      if (typeof node === 'string') {
-        const value = node as string;
-        const language = this.alphabetEngine!.detectLanguage(value);
-        const normalized = this.alphabetEngine!.normalizeWord(value, language);
-        const tokens = this.alphabetEngine!.textToTokenIds(value, language);
-        const numericId = this.alphabetEngine!.textToNumericId(value, language);
-        const phraseTree = this.alphabetEngine!.parsePhrases(value, language);
-        const searchGraph = this.alphabetEngine!.buildSearchGraph(value, language);
-
-        results[path] = {
-          original: value,
-          normalized,
-          language,
-          tokens,
-          numericId,
-          phraseTree,
-          searchGraph,
-        };
-
-        return;
-      }
-
-      if (Array.isArray(node)) {
-        node.forEach((child, idx) => walk(child, `${path}[${idx}]`));
-        return;
-      }
-
-      if (typeof node === 'object') {
-        Object.entries(node as Record<string, unknown>).forEach(([k, v]) => {
-          const nextPath = path ? `${path}.${k}` : k;
-          walk(v, nextPath);
-        });
-        return;
-      }
-    };
-
-    walk(payload, 'payload');
-
-    const alphabetMeta = { alphabet: results };
-    return Object.freeze({ ...(metadata || {}), ...alphabetMeta });
-  }
 }

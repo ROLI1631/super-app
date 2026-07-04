@@ -1,5 +1,5 @@
-import { CatalogRegistry } from '../engines/catalog';
-import { NumericId, LanguageCode } from '../core/types';
+import { CatalogRegistry } from '../../engines/catalog';
+import { NumericId, LanguageCode } from '../../core/types';
 
 export class CatalogApi {
   constructor(private readonly catalog: CatalogRegistry) {}

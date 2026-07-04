@@ -1,8 +1,8 @@
-import { createDefaultCoreServices } from '../core/factory';
+import { createDefaultInfrastructureServices } from '../infrastructure/factory';
 
 describe('Event pipeline', () => {
   it('should process a dispatched API request through the full event flow', async () => {
-    const services = createDefaultCoreServices();
+    const services = createDefaultInfrastructureServices();
     const received: unknown[] = [];
 
     services.eventPipeline.subscribe((event) => {

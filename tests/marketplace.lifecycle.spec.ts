@@ -1,8 +1,8 @@
-import { createDefaultCoreServices } from '../core/factory';
+import { createDefaultInfrastructureServices } from '../infrastructure/factory';
 
 describe('Marketplace lifecycle flows', () => {
   it('publish and reserve and expire reservation', async () => {
-    const core = createDefaultCoreServices();
+    const core = createDefaultInfrastructureServices();
     const m = core.marketplace;
     const events: any[] = [];
     core.eventBus.subscribe('Marketplace.ListingPublished', (e) => events.push(e));
@@ -31,7 +31,7 @@ describe('Marketplace lifecycle flows', () => {
   });
 
   it('order lifecycle: create -> pay -> deliver', async () => {
-    const core = createDefaultCoreServices();
+    const core = createDefaultInfrastructureServices();
     const m = core.marketplace;
     const owner = 30;
     const listing = await m.createListing(owner, { title: 'Item B', price: 20 }, { userId: owner, sessionId: owner, containerId: 0, moduleId: 0 });
@@ -50,7 +50,7 @@ describe('Marketplace lifecycle flows', () => {
   });
 
   it('negotiation flow', async () => {
-    const core = createDefaultCoreServices();
+    const core = createDefaultInfrastructureServices();
     const m = core.marketplace;
     const owner = 50;
     const listing = await m.createListing(owner, { title: 'Item C' }, { userId: owner, sessionId: owner, containerId: 0, moduleId: 0 });

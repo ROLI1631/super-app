@@ -1,4 +1,4 @@
-import { WalletRegistry, BalanceEngine, AccountingEngine } from '../engines/finance';
+import { WalletRegistry, BalanceEngine, AccountingEngine } from '../../engines/finance';
 
 export class FinanceApi {
   constructor(private readonly walletRegistry: WalletRegistry, private readonly balanceEngine: BalanceEngine, private readonly accounting: AccountingEngine) {}

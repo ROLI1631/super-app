@@ -1,5 +1,5 @@
-import { NumericId } from '../core/types';
-import { NumericNode, NumericUniverseRegistry } from '../engines/numericUniverse';
+import { NumericId } from '../../core/types';
+import { NumericNode, NumericUniverseRegistry } from '../../engines/numericUniverse';
 
 export interface NumericUniverseApi {
   getNode(id: NumericId): NumericNode | undefined;

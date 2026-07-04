@@ -52,10 +52,10 @@ describe('SimpleAlphabetEngine', () => {
 });
 
 describe('Event Pipeline integration', () => {
-  const { createDefaultCoreServices } = require('../core/factory');
+  const { createDefaultInfrastructureServices } = require('../infrastructure/factory');
 
   it('enriches events with alphabet metadata for all strings recursively', async () => {
-    const services = createDefaultCoreServices();
+    const services = createDefaultInfrastructureServices();
     const payload = {
       title: 'Cheap car',
       description: 'A red auto',

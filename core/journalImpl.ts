@@ -55,8 +55,8 @@ export class InMemoryJournal implements Journal {
     });
   }
 
-  append<T extends object>(entry: Omit<JournalEntry<T>, 'createdAt'>): JournalEntry<T> {
-    const timestamp: Timestamp = new Date().toISOString();
+  append<T extends object>(entry: Omit<JournalEntry<T>, 'createdAt'> & { readonly createdAt?: Timestamp }): JournalEntry<T> {
+    const timestamp: Timestamp = entry.createdAt ?? new Date().toISOString();
     const journalEntry = deepFreeze({ ...entry, createdAt: timestamp }) as JournalEntry<T>;
     this.entries.push(journalEntry as JournalEntry<object>);
     return journalEntry;

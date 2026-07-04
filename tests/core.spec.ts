@@ -13,6 +13,19 @@ describe('Core implementation', () => {
     expect(journalEntry).toEqual(record);
   });
 
+  it('should attach operational time metadata and lifecycle state to journal records', () => {
+    const services = createDefaultCoreServices();
+    const record = services.timeCore.record({ message: 'hello' }, 'system.event', 1);
+
+    const metadata = record.metadata as Record<string, unknown> | undefined;
+    expect(metadata).toBeDefined();
+    expect(metadata?.operationalTime).toBe(record.createdAt);
+    expect(metadata?.eventOrder).toBeDefined();
+    expect(metadata?.eventRoute).toBe('system.event');
+    expect((metadata?.lifecycle as Record<string, unknown>)?.state).toBe('created');
+    expect((metadata?.lifecycle as Record<string, unknown>)?.status).toBe('active');
+  });
+
   it('should publish and subscribe events through the Event Bus', async () => {
     const services = createDefaultCoreServices();
     const receivedEvents: unknown[] = [];

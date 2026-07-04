@@ -23,7 +23,7 @@ export interface JournalReader {
 }
 
 export interface JournalWriter {
-  append(entry: Omit<JournalEntry<object>, 'createdAt'>): JournalEntry<object>;
+  append(entry: Omit<JournalEntry<object>, 'createdAt'> & { readonly createdAt?: Timestamp }): JournalEntry<object>;
 }
 
 export interface Journal extends JournalReader, JournalWriter {}

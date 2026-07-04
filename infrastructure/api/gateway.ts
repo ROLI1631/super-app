@@ -1,7 +1,7 @@
-import { ApiRequest, PlatformEvent, RAW_EVENT_CHANNEL } from '../core/event';
-import { EventBus, EventMessage } from '../core/eventBus';
-import { EventProtocol } from '../core/protocol';
-import { ProtocolEngine, ProtocolExecutionContext } from '../core/protocolEngine';
+import { ApiRequest, PlatformEvent, RAW_EVENT_CHANNEL } from '../../core/event';
+import { EventBus, EventMessage } from '../../core/eventBus';
+import { EventProtocol } from '../../core/protocol';
+import { ProtocolEngine, ProtocolExecutionContext } from '../../core/protocolEngine';
 
 export type RequestValidator = <T extends object>(request: ApiRequest<T>) => boolean;
 

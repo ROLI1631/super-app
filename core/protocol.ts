@@ -1,6 +1,9 @@
 import { ApiRequest, PlatformEvent } from './event';
-import { NumericIndex } from '../engines/numericIndex';
-import { Timestamp } from './types';
+import { NumericId, Timestamp } from './types';
+
+export interface NumericIdProvider {
+  nextId(): NumericId;
+}
 
 export interface EventProtocol {
   build<T extends object>(request: ApiRequest<T>): PlatformEvent<T>;
@@ -23,12 +26,12 @@ function deepFreeze<T extends object>(value: T): T {
 
 export class DefaultProtocol implements EventProtocol {
   constructor(
-    private readonly numericIndex: NumericIndex,
+    private readonly numericIdProvider: NumericIdProvider,
     private readonly clock: () => Timestamp,
   ) {}
 
   build<T extends object>(request: ApiRequest<T>): PlatformEvent<T> {
-    const numericId = this.numericIndex.nextId('event');
+    const numericId = this.numericIdProvider.nextId();
     const event: PlatformEvent<T> = {
       eventId: `event:${numericId}`,
       numericId,

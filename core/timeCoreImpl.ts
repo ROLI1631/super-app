@@ -5,6 +5,8 @@ import { TimeCore } from './timeCore';
 export type TimeIdGenerator = () => NumericId;
 
 export class DefaultTimeCore implements TimeCore {
+  private eventSequence = 0;
+
   constructor(
     private readonly journal: JournalWriter,
     private readonly generateId: TimeIdGenerator,
@@ -49,12 +51,26 @@ export class DefaultTimeCore implements TimeCore {
     recorderId: NumericId,
     metadata?: Metadata,
   ): JournalEntry<object> {
-    const entry: Omit<JournalEntry<object>, 'createdAt'> = {
+    const timestamp = this.now();
+    this.eventSequence += 1;
+
+    const entry: Omit<JournalEntry<object>, 'createdAt'> & { readonly createdAt?: Timestamp } = {
       id: this.generateId(),
       recorderId,
       recordType,
       payload,
-      metadata,
+      metadata: {
+        ...(metadata ? { ...metadata } : {}),
+        operationalTime: timestamp,
+        eventOrder: this.eventSequence,
+        eventRoute: recordType,
+        lifecycle: {
+          state: 'created',
+          status: 'active',
+          startedAt: timestamp,
+        },
+      },
+      createdAt: timestamp,
     };
 
     return this.journal.append(entry);

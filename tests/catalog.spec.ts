@@ -1,8 +1,8 @@
-import { createDefaultCoreServices } from '../core/factory';
+import { createDefaultInfrastructureServices } from '../infrastructure/factory';
 
 describe('Catalog Engine', () => {
   it('registers categories and objects, supports search and attribute discovery', () => {
-    const services = createDefaultCoreServices();
+    const services = createDefaultInfrastructureServices();
 
     const cat = services.catalog.registerCategory('vehicles');
     const sub = services.catalog.registerCategory('cars', cat.id);

@@ -1,8 +1,8 @@
-import { createDefaultCoreServices } from '../core/factory';
+import { createDefaultInfrastructureServices } from '../infrastructure/factory';
 
 describe('Finance Engine (TOM9) basic flows', () => {
   it('creates wallets and processes a transfer', () => {
-    const core = createDefaultCoreServices();
+    const core = createDefaultInfrastructureServices();
     const walletReg = core.walletRegistry;
     const balance = core.balanceEngine;
     const accounting = core.accountingEngine as any;
