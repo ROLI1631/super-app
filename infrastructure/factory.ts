@@ -112,8 +112,15 @@ export function createDefaultInfrastructureServices(): InfrastructureServices {
   })();
   const catalog = new InMemoryCatalog(generateNumericId, alphabetEngine, numericUniverse);
   const attributeEngine = new InMemoryAttributeEngine();
-  const marketplace = createInMemoryMarketplace(undefined, core.protocolEngine);
-  const finance = createInMemoryFinance(undefined, core.protocolEngine);
+const marketplace = createInMemoryMarketplace(
+  core.eventBus,
+  core.protocolEngine,
+);
+
+const finance = createInMemoryFinance(
+  core.eventBus,
+  core.protocolEngine,
+);
   const apiGateway = new DefaultApiGateway(core.eventBus, core.protocol, core.protocolEngine, (req) => !!req.action && !!req.payload);
   const numericNavigator = new DefaultNumericNavigator(alphabetEngine, numericUniverse, core.navigationCore, core.protocol, core.eventBus);
   const businessRouter = new DefaultBusinessRuntimeRouter(
