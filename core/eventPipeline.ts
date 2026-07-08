@@ -45,7 +45,7 @@ export class DefaultEventPipeline implements EventPipeline {
   private async handleRawEvent(eventMessage: EventMessage<PlatformEvent>): Promise<void> {
     const event = eventMessage.payload;
 
-    this.timeCore.record(event, EVENT_RECORD_TYPE, event.moduleId, event.metadata);
+    const journalEntry = this.timeCore.record(event, EVENT_RECORD_TYPE, event.userId, event.metadata);
 
     const enrichedMetadata = this.metadataEnricher
       ? this.metadataEnricher.enrich(event.payload, event.metadata)
@@ -53,13 +53,18 @@ export class DefaultEventPipeline implements EventPipeline {
 
     const processedEvent = {
       ...event,
+      journalId: journalEntry.id,
+      timestamp: journalEntry.coordinate,
+      coordinate: journalEntry.coordinate,
+      so8fiCode: journalEntry.so8fiCode,
+      hash: journalEntry.hash,
       metadata: enrichedMetadata,
     } as PlatformEvent;
 
     await this.eventBus.publish({
       type: PROCESSED_EVENT_CHANNEL,
       payload: processedEvent,
-      timestamp: event.timestamp,
+      timestamp: journalEntry.coordinate,
       sourceId: event.moduleId,
       metadata: enrichedMetadata,
     });

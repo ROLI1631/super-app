@@ -6,7 +6,7 @@ import { ProtocolEngine, ProtocolExecutionContext } from '../../core/protocolEng
 export type RequestValidator = <T extends object>(request: ApiRequest<T>) => boolean;
 
 export interface ApiGateway {
-  dispatch<T extends object>(request: ApiRequest<T>): Promise<void>;
+  dispatch<T extends object>(request: ApiRequest<T>): Promise<PlatformEvent<T>>;
 }
 
 export class DefaultApiGateway implements ApiGateway {
@@ -17,7 +17,7 @@ export class DefaultApiGateway implements ApiGateway {
     private readonly validator?: RequestValidator,
   ) {}
 
-  async dispatch<T extends object>(request: ApiRequest<T>): Promise<void> {
+  async dispatch<T extends object>(request: ApiRequest<T>): Promise<PlatformEvent<T>> {
     if (this.validator && !this.validator(request)) {
       throw new Error('Invalid request');
     }
@@ -51,5 +51,6 @@ export class DefaultApiGateway implements ApiGateway {
     };
 
     await this.eventBus.publish(message);
+    return event;
   }
 }

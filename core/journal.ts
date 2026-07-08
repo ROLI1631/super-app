@@ -1,29 +1,40 @@
-import { Metadata, NumericId, RecordType, Timestamp } from './types';
+import { NumericId } from './types';
 
-export interface JournalEntry<T extends object = object> {
+export interface JournalEntry {
   readonly id: NumericId;
-  readonly createdAt: Timestamp;
-  readonly recorderId: NumericId;
-  readonly recordType: RecordType;
-  readonly payload: T;
-  readonly metadata?: Metadata;
+  readonly coordinate: string;
+  readonly so8fiCode: string;
+  readonly identityId: NumericId;
+  readonly intent: string;
+  readonly protocol: string;
+  readonly event: Readonly<{
+    readonly eventId: string;
+    readonly eventType: string;
+  }>;
+  readonly businessResult: unknown;
+  readonly notificationResult: unknown;
+  readonly hash: string;
+  readonly signature: string;
+  readonly version: string;
 }
 
 export interface JournalQuery {
-  readonly recordType?: RecordType;
-  readonly recorderId?: NumericId;
-  readonly since?: Timestamp;
-  readonly until?: Timestamp;
+  readonly identityId?: NumericId;
+  readonly intent?: string;
+  readonly protocol?: string;
+  readonly fromCoordinate?: string;
+  readonly toCoordinate?: string;
+  readonly version?: string;
 }
 
 export interface JournalReader {
-  readAll(): readonly JournalEntry<object>[];
-  readById(id: NumericId): JournalEntry<object> | undefined;
-  query(filter: JournalQuery): readonly JournalEntry<object>[];
+  readAll(): readonly JournalEntry[];
+  readById(id: NumericId): JournalEntry | undefined;
+  query(filter: JournalQuery): readonly JournalEntry[];
 }
 
 export interface JournalWriter {
-  append(entry: Omit<JournalEntry<object>, 'createdAt'> & { readonly createdAt?: Timestamp }): JournalEntry<object>;
+  append(entry: Omit<JournalEntry, 'id'>): JournalEntry;
 }
 
 export interface Journal extends JournalReader, JournalWriter {}

@@ -1,66 +1,150 @@
-import { MarketplaceService } from '../../engines/marketplace';
-import { ServiceContext } from '../../engines/marketplace';
+import { RuntimeOrchestrator } from '../runtime/orchestrator';
 
 export class MarketplaceApi {
-  constructor(private readonly svc: MarketplaceService) {}
+  constructor(private readonly orchestrator: RuntimeOrchestrator) {}
 
   async createListing(userId: number, input: { title: string; description?: string; categoryId?: number; price?: number }) {
-    const ctx: ServiceContext = {
+    const execution = await this.orchestrator.execute({
+      action: 'marketplace.createListing',
+      payload: {
+        ownerId: userId,
+        input,
+      },
       userId,
       sessionId: userId,
       containerId: 0,
       moduleId: 0,
-    };
-    return this.svc.createListing(userId, input, ctx);
+    });
+
+    return execution.result;
   }
 
   async createOffer(userId: number, listingId: number, amount: number) {
-    const ctx: ServiceContext = { userId, sessionId: userId, containerId: 0, moduleId: 0 };
-    return this.svc.createOffer(userId, listingId, amount, ctx);
+    const execution = await this.orchestrator.execute({
+      action: 'marketplace.createOffer',
+      payload: {
+        userId,
+        listingId,
+        amount,
+      },
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+
+    return execution.result;
   }
 
-  getListing(id: number) {
-    return this.svc.getListing(id);
+  async getListing(id: number, userId = 1) {
+    const execution = await this.orchestrator.execute({
+      action: 'marketplace.getListing',
+      payload: { id },
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+    return execution.result;
   }
 
-  getOffer(id: number) {
-    return this.svc.getOffer(id);
+  async getOffer(id: number, userId = 1) {
+    const execution = await this.orchestrator.execute({
+      action: 'marketplace.getOffer',
+      payload: { id },
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+    return execution.result;
   }
 
-  getReservation(id: number) {
-    // @ts-ignore
-    return (this.svc as any).getReservation ? (this.svc as any).getReservation(id) : undefined;
+  async getReservation(id: number, userId = 1) {
+    const execution = await this.orchestrator.execute({
+      action: 'marketplace.getReservation',
+      payload: { id },
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+    return execution.result;
   }
 
-  getOrder(id: number) {
-    return this.svc.getOrder(id);
+  async getOrder(id: number, userId = 1) {
+    const execution = await this.orchestrator.execute({
+      action: 'marketplace.getOrder',
+      payload: { id },
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+    return execution.result;
   }
 
-  getNegotiation(id: number) {
-    // @ts-ignore
-    return (this.svc as any).getNegotiation ? (this.svc as any).getNegotiation(id) : undefined;
+  async getNegotiation(id: number, userId = 1) {
+    const execution = await this.orchestrator.execute({
+      action: 'marketplace.getNegotiation',
+      payload: { id },
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+    return execution.result;
   }
 
-  listListings(categoryId?: number) {
-    return this.svc.listListings(categoryId);
+  async listListings(categoryId?: number, userId = 1) {
+    const execution = await this.orchestrator.execute({
+      action: 'marketplace.listListings',
+      payload: { categoryId },
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+    return execution.result;
   }
 
-  listOrders() {
-    // @ts-ignore
-    return (this.svc as any).listOrders ? (this.svc as any).listOrders() : [];
+  async listOrders(userId = 1) {
+    const execution = await this.orchestrator.execute({
+      action: 'marketplace.listOrders',
+      payload: {},
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+    return execution.result;
   }
 
-  listReservations() {
-    // @ts-ignore
-    return (this.svc as any).listReservations ? (this.svc as any).listReservations() : [];
+  async listReservations(userId = 1) {
+    const execution = await this.orchestrator.execute({
+      action: 'marketplace.listReservations',
+      payload: {},
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+    return execution.result;
   }
 
-  listOffers() {
-    // @ts-ignore
-    return (this.svc as any).listOffers ? (this.svc as any).listOffers() : [];
+  async listOffers(userId = 1) {
+    const execution = await this.orchestrator.execute({
+      action: 'marketplace.listOffers',
+      payload: {},
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+    return execution.result;
   }
 }
 
-export function createMarketplaceApi(svc: MarketplaceService) {
-  return new MarketplaceApi(svc);
+export function createMarketplaceApi(orchestrator: RuntimeOrchestrator) {
+  return new MarketplaceApi(orchestrator);
 }

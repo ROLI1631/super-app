@@ -7,11 +7,13 @@ import { DefaultProtocol } from './protocol';
 import { DefaultEventPipeline, MetadataEnricher } from './eventPipeline';
 import { DefaultProtocolEngine, ProtocolEngine } from './protocolEngine';
 import { NumericId, Timestamp } from './types';
+import { createTemporalKernelFromJournal, TemporalKernel } from './temporal/TemporalFactory';
 
 export interface CoreServices {
   readonly journal: InMemoryJournal;
   readonly eventBus: InProcessEventBus;
   readonly timeCore: DefaultTimeCore;
+  readonly temporalKernel: TemporalKernel;
   readonly identityCore: InMemoryIdentityCore;
   readonly navigationCore: DefaultNavigationCore;
   readonly protocol: DefaultProtocol;
@@ -41,7 +43,7 @@ export interface CoreFactoryOptions {
 export function createDefaultCoreServices(options: CoreFactoryOptions = {}): CoreServices {
   const createJournal = () => new InMemoryJournal();
   const createEventBus = () => new InProcessEventBus();
-  const createTimeCore = (journal: InMemoryJournal) => new DefaultTimeCore(journal, generateNumericId, timestampProvider);
+  const createTimeCore = (journal: InMemoryJournal, temporal: TemporalKernel) => new DefaultTimeCore(journal, temporal);
   const createIdentityCore = () => new InMemoryIdentityCore(generateNumericId, timestampProvider);
   const createNavigationCore = () => new DefaultNavigationCore(defaultRoutes, '/');
   const createProtocol = () => new DefaultProtocol({
@@ -52,8 +54,9 @@ export function createDefaultCoreServices(options: CoreFactoryOptions = {}): Cor
     new DefaultEventPipeline(bus, time, journalInst, options.metadataEnricher);
 
   const journal = createJournal();
+  const temporalKernel = createTemporalKernelFromJournal(journal);
   const eventBus = createEventBus();
-  const timeCore = createTimeCore(journal);
+  const timeCore = createTimeCore(journal, temporalKernel);
   const identityCore = createIdentityCore();
   const navigationCore = createNavigationCore();
   const protocol = createProtocol();
@@ -64,6 +67,7 @@ export function createDefaultCoreServices(options: CoreFactoryOptions = {}): Cor
     journal,
     eventBus,
     timeCore,
+    temporalKernel,
     identityCore,
     navigationCore,
     protocol,

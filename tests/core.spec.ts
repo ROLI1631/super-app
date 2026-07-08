@@ -1,29 +1,26 @@
 import { createDefaultCoreServices } from '../core/factory';
 
 describe('Core implementation', () => {
-  it('should compose default core services and persist journal entries through Time Core', async () => {
+  it('should compose default core services and persist immutable temporal journal entries through Time Core', async () => {
     const services = createDefaultCoreServices();
     const record = services.timeCore.record({ message: 'hello' }, 'system.event', 1);
 
     expect(record.id).toBeGreaterThan(0);
-    expect(record.createdAt).toBeDefined();
-    expect(record.payload).toEqual({ message: 'hello' });
+    expect(record.coordinate).toMatch(/^\d{4}\.\d{4}\.\d{3}\.\d{2}\.\d{2}\.\d{2}\.\d{2}\.\d{4}$/);
+    expect(record.so8fiCode.startsWith('SO8FI.')).toBe(true);
+    expect(record.protocol).toBe('system.event');
+    expect(record.identityId).toBe(1);
+    expect(record.hash).toHaveLength(64);
 
     const journalEntry = services.journal.readById(record.id);
     expect(journalEntry).toEqual(record);
   });
 
-  it('should attach operational time metadata and lifecycle state to journal records', () => {
+  it('should generate monotonic movement coordinates', () => {
     const services = createDefaultCoreServices();
-    const record = services.timeCore.record({ message: 'hello' }, 'system.event', 1);
-
-    const metadata = record.metadata as Record<string, unknown> | undefined;
-    expect(metadata).toBeDefined();
-    expect(metadata?.operationalTime).toBe(record.createdAt);
-    expect(metadata?.eventOrder).toBeDefined();
-    expect(metadata?.eventRoute).toBe('system.event');
-    expect((metadata?.lifecycle as Record<string, unknown>)?.state).toBe('created');
-    expect((metadata?.lifecycle as Record<string, unknown>)?.status).toBe('active');
+    const first = services.timeCore.record({ message: 'first' }, 'system.event', 1);
+    const second = services.timeCore.record({ message: 'second' }, 'system.event', 1);
+    expect(first.coordinate < second.coordinate).toBe(true);
   });
 
   it('should publish and subscribe events through the Event Bus', async () => {
@@ -37,7 +34,7 @@ describe('Core implementation', () => {
     await services.eventBus.publish({
       type: 'test.event',
       payload: { value: 42 },
-      timestamp: services.timeCore.now(),
+      timestamp: services.timeCore.record({ value: 42 }, 'test.event', 1).coordinate,
     });
 
     expect(receivedEvents).toEqual([{ value: 42 }]);

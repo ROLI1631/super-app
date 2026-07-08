@@ -12,7 +12,7 @@ export default function CategoriesPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {categories.map((category) => {
+        {categories.map((category: any) => {
           const items = catalogApi.getByCategory(category.id);
           return (
             <Link key={category.id} href={`/search?query=${encodeURIComponent(category.label)}`} className="group rounded-3xl border border-slate-800 bg-slate-950 p-6 transition hover:border-slate-700 hover:bg-slate-900">

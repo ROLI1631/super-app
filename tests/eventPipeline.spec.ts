@@ -23,9 +23,9 @@ describe('Event pipeline', () => {
     const receivedPayload = first && (first.payload !== undefined ? first.payload : first);
     expect(receivedPayload).toEqual({ username: 'tester' });
 
-    const journalEntries = services.journal.query({ recordType: 'platform.event' });
+    const journalEntries = services.journal.query({ protocol: 'platform.event' });
     expect(journalEntries.length).toBe(1);
-    // journal stores the PlatformEvent as payload; its inner payload should match
-    expect(journalEntries[0].payload.payload).toEqual({ username: 'tester' });
+    expect(journalEntries[0].so8fiCode.startsWith('SO8FI.')).toBe(true);
+    expect(journalEntries[0].coordinate).toMatch(/^\d{4}\.\d{4}\.\d{3}\.\d{2}\.\d{2}\.\d{2}\.\d{2}\.\d{4}$/);
   });
 });

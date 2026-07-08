@@ -1,7 +1,4 @@
 import { createDefaultInfrastructureServices } from '../infrastructure/factory';
-import { CatalogApi } from '../infrastructure/api/catalogApi';
-import { createMarketplaceApi } from '../infrastructure/api/marketplaceApi';
-import { createFinanceApi } from '../infrastructure/api/financeApi';
 
 const services = createDefaultInfrastructureServices();
 
@@ -87,7 +84,7 @@ if (services.walletRegistry.listWallets().length === 0) {
 }
 
 export const catalogApi = new CatalogApi(services.catalog);
-export const marketplaceApi = createMarketplaceApi(services.marketplace);
-export const financeApi = createFinanceApi(services.walletRegistry, services.balanceEngine, services.accountingEngine);
+export const marketplaceApi = services.marketplaceApi;
+export const financeApi = services.financeApi;
 export const identityCore = services.identityCore;
 export const coreServices = services;

@@ -1,30 +1,69 @@
-import { WalletRegistry, BalanceEngine, AccountingEngine } from '../../engines/finance';
+import { RuntimeOrchestrator } from '../runtime/orchestrator';
 
 export class FinanceApi {
-  constructor(private readonly walletRegistry: WalletRegistry, private readonly balanceEngine: BalanceEngine, private readonly accounting: AccountingEngine) {}
+  constructor(private readonly orchestrator: RuntimeOrchestrator) {}
 
-  getWallet(id: number) {
-    return this.walletRegistry.getWallet(id);
+  async getWallet(id: number, userId = 1) {
+    const execution = await this.orchestrator.execute({
+      action: 'finance.getWallet',
+      payload: { id },
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+    return execution.result;
   }
 
-  listWallets() {
-    return this.walletRegistry.listWallets();
+  async listWallets(userId = 1) {
+    const execution = await this.orchestrator.execute({
+      action: 'finance.listWallets',
+      payload: {},
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+    return execution.result;
   }
 
-  getBalance(walletId: number) {
-    return this.balanceEngine.getBalance(walletId);
+  async getBalance(walletId: number, userId = 1) {
+    const execution = await this.orchestrator.execute({
+      action: 'finance.getBalance',
+      payload: { walletId },
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+    return execution.result;
   }
 
-  listTransactions(walletId?: number) {
-    return this.accounting.listTransactions(walletId);
+  async listTransactions(walletId?: number, userId = 1) {
+    const execution = await this.orchestrator.execute({
+      action: 'finance.listTransactions',
+      payload: { walletId },
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+    return execution.result;
   }
 
-  listLedgerEntries(walletId?: number) {
-    // @ts-ignore
-    return (this.accounting as any).ledger ? (this.accounting as any).ledger.list(walletId) : [];
+  async listLedgerEntries(walletId?: number, userId = 1) {
+    const execution = await this.orchestrator.execute({
+      action: 'finance.listLedgerEntries',
+      payload: { walletId },
+      userId,
+      sessionId: userId,
+      containerId: 0,
+      moduleId: 0,
+    });
+    return execution.result;
   }
 }
 
-export function createFinanceApi(walletRegistry: WalletRegistry, balanceEngine: BalanceEngine, accounting: AccountingEngine) {
-  return new FinanceApi(walletRegistry, balanceEngine, accounting);
+export function createFinanceApi(orchestrator: RuntimeOrchestrator) {
+  return new FinanceApi(orchestrator);
 }

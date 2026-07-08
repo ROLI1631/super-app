@@ -17,6 +17,10 @@ export interface PlatformEvent<T extends object = object> {
   readonly numericId: NumericId;
   readonly type: string;
   readonly timestamp: Timestamp;
+  readonly journalId?: NumericId;
+  readonly coordinate?: string;
+  readonly so8fiCode?: string;
+  readonly hash?: string;
   readonly userId: NumericId;
   readonly sessionId: NumericId;
   readonly containerId: NumericId;

@@ -1,5 +1,5 @@
 import { Journal, JournalEntry, JournalQuery } from './journal';
-import { NumericId, Timestamp } from './types';
+import { NumericId } from './types';
 
 function deepFreeze<T>(value: T, visited = new WeakSet<object>()): T {
   if (value === null || typeof value !== 'object') {
@@ -23,31 +23,40 @@ function deepFreeze<T>(value: T, visited = new WeakSet<object>()): T {
 }
 
 export class InMemoryJournal implements Journal {
-  private readonly entries: JournalEntry<object>[] = [];
+  private readonly entries: JournalEntry[] = [];
+  private idSequence = 0;
 
-  readAll(): readonly JournalEntry<object>[] {
+  readAll(): readonly JournalEntry[] {
     return this.entries.slice();
   }
 
-  readById(id: NumericId): JournalEntry<object> | undefined {
+  readById(id: NumericId): JournalEntry | undefined {
     return this.entries.find((entry) => entry.id === id);
   }
 
-  query(filter: JournalQuery): readonly JournalEntry<object>[] {
+  query(filter: JournalQuery): readonly JournalEntry[] {
     return this.entries.filter((entry) => {
-      if (filter.recordType && entry.recordType !== filter.recordType) {
+      if (filter.intent && entry.intent !== filter.intent) {
         return false;
       }
 
-      if (filter.recorderId !== undefined && entry.recorderId !== filter.recorderId) {
+      if (filter.protocol && entry.protocol !== filter.protocol) {
         return false;
       }
 
-      if (filter.since && entry.createdAt < filter.since) {
+      if (filter.identityId !== undefined && entry.identityId !== filter.identityId) {
         return false;
       }
 
-      if (filter.until && entry.createdAt > filter.until) {
+      if (filter.fromCoordinate && entry.coordinate < filter.fromCoordinate) {
+        return false;
+      }
+
+      if (filter.toCoordinate && entry.coordinate > filter.toCoordinate) {
+        return false;
+      }
+
+      if (filter.version && entry.version !== filter.version) {
         return false;
       }
 
@@ -55,10 +64,10 @@ export class InMemoryJournal implements Journal {
     });
   }
 
-  append<T extends object>(entry: Omit<JournalEntry<T>, 'createdAt'> & { readonly createdAt?: Timestamp }): JournalEntry<T> {
-    const timestamp: Timestamp = entry.createdAt ?? new Date().toISOString();
-    const journalEntry = deepFreeze({ ...entry, createdAt: timestamp }) as JournalEntry<T>;
-    this.entries.push(journalEntry as JournalEntry<object>);
+  append(entry: Omit<JournalEntry, 'id'>): JournalEntry {
+    this.idSequence += 1;
+    const journalEntry = deepFreeze({ ...entry, id: this.idSequence }) as JournalEntry;
+    this.entries.push(journalEntry);
     return journalEntry;
   }
 }
